@@ -1,0 +1,17 @@
+Game:
+    "game" name=STRING
+    ("levels" levels=INT)?
+    "output_file" output=STRING
+    player=Player
+    controls=Controls
+;
+
+Player:
+    "color" color=STRING
+    "height" height=INT
+    "widht" width=INT
+;
+
+Controls:
+    "up"
+;

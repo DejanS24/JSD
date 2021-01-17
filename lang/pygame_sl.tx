@@ -1,0 +1,11 @@
+Game:
+  "game" name=STRING
+  (description=STRING)?
+  player=Player
+;
+
+Player:
+    "image" path=STRING | "color" color=STRING
+    "height" height=INT
+    "widht" width=INT
+;
