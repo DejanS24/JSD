@@ -213,6 +213,7 @@ class Level():
         for enemy in self.enemy_list:
             enemy.rect.x += shift_x
 
+
 class SpeedBoost(pygame.sprite.Sprite):
 
     def __init__(self):
@@ -331,8 +332,8 @@ def main():
     # -------- Main Program Loop -----------
     while not done:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT  or \
-                (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            if event.type == pygame.QUIT or \
+             (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 done = True
 
             if event.type == pygame.KEYDOWN:

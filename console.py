@@ -19,11 +19,11 @@ def pygame_sl():
 
     args = parser.parse_args()
 
-    # try:
-    model = pygame_sl_mm.model_from_file(args.model)
-    # except Exception as e:
-    #     print(e)
-    #     return
+    try:
+        model = pygame_sl_mm.model_from_file(args.model)
+    except Exception as e:
+        print(e)
+        return
 
     print("Generating code for target")
     try:
