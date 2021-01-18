@@ -1,7 +1,9 @@
 import sys
 import argparse
 import re
-from 
+from pygame_sl.generator import generate
+from pygame_sl.lang.pglang import pygame_sl_mm
+
 
 def pygame_sl():
 
@@ -17,25 +19,25 @@ def pygame_sl():
 
     args = parser.parse_args()
 
-    try:
-        model = 1
-        # model = pygame_sl_mm.model_from_file(args.model)
-    except Exception as e:
-        print(e)
-        return
+    # try:
+    model = pygame_sl_mm.model_from_file(args.model)
+    # except Exception as e:
+    #     print(e)
+    #     return
 
     print("Generating code for target")
     try:
-        generate(model, target)
+        generate(model)
     except Exception as e:
         print(str(e))
         return
     finally:
         print("Done")
 
+
 if __name__ == '__main__':
 
-    path = "C:/Users/Dejan/Desktop/testigrica.pg"
+    path = "./testigrica.pg"
     sys.argv[0] = "pygame_sl"
     sys.argv.append(path)
 

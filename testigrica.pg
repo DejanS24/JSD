@@ -1,0 +1,31 @@
+game "Test"
+
+player {
+  color red
+  height 150
+  width 150
+}
+
+boost Speed {
+  color green
+}
+
+point {
+  color yellow
+}
+
+level Level1 {
+  platform {
+    position 120 120
+    height 100
+    width 370
+  }
+}
+
+level Level2 {
+  platform {
+    position 120 120
+    height 100
+    width 370
+  }
+}

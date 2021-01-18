@@ -2,10 +2,55 @@ Game:
   "game" name=STRING
   (description=STRING)?
   player=Player
+  items*=Item
+  levels+=Level
 ;
 
 Player:
-    "image" path=STRING | "color" color=STRING
+  "player" "{"
+    ( Image | Color)
     "height" height=INT
-    "widht" width=INT
+    "width" width=INT
+  "}"
+;
+
+Image:
+  "image" path=STRING
+;
+
+Color:
+  "color" color=WORD
+;
+Item:
+  Boost | Point
+;
+
+Boost:
+  "boost" name=ID "{"
+    ( Image | Color)
+  "}"
+;
+
+Point:
+  "point" "{"
+    ( Image | Color)
+  "}"
+;
+
+Level:
+  "level" name=ID "{"
+    platforms+=Platform
+  "}"
+;
+
+Platform:
+  "platform" "{"
+    "position" x=INT y=INT
+    "height" height=INT
+    "width" width=INT
+  "}"
+;
+
+WORD:
+  INT|/[-\w]*\b/
 ;
