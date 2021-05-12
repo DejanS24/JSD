@@ -13,6 +13,7 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+
 # Test
 class Player(pygame.sprite.Sprite):
     """ This class represents the bar at the bottom that the player
@@ -154,7 +155,6 @@ class Level(object):
         # self.boost.rect.x = 400
         # self.boost.rect.y = 200
 
-
     # Update everythign on this level
     def update(self):
         """ Update everything in this level."""
@@ -202,7 +202,6 @@ class SpeedBoost(pygame.sprite.Sprite):
         self.kill()
 
 
-
 class Level1(Level):
     """ Definition for level 1. """
 
@@ -227,6 +226,8 @@ class Level1(Level):
             block.rect.y = platform[3]
             block.player = self.player
             self.platform_list.add(block)
+
+
 class Level2(Level):
     """ Definition for level 1. """
 
@@ -252,6 +253,7 @@ class Level2(Level):
             block.player = self.player
             self.platform_list.add(block)
 
+
 def main():
     """ Main Program """
     pygame.init()
@@ -267,7 +269,7 @@ def main():
 
     # Create all the levels
     level_list = []
-    
+
     level_list.append(Level1(player))
     level_list.append(Level2(player))
 
@@ -292,7 +294,7 @@ def main():
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or \
-             (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 done = True
 
             if event.type == pygame.KEYDOWN:
@@ -331,7 +333,7 @@ def main():
         current_position = player.rect.x + current_level.world_shift
         if current_position < current_level.level_limit:
             player.rect.x = 120
-            if current_level_no < len(level_list)-1:
+            if current_level_no < len(level_list) - 1:
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level

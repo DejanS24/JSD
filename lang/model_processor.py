@@ -10,8 +10,6 @@ colors = [
     "white"
 ]
 
-def create_resolve_Stimulus(stimulus, test_type, condition, metamodel):
-    pass
 
 def pygame_sl_model_processor(model, metamodel):
     

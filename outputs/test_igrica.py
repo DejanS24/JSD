@@ -13,7 +13,7 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-# {{ m.name}}
+# Test igrica
 class Player(pygame.sprite.Sprite):
     """ This class represents the bar at the bottom that the player
         controls. """
@@ -27,15 +27,10 @@ class Player(pygame.sprite.Sprite):
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = {{ m.player.width }}
-        height = {{ m.player.height }}
-    {%- if m.player.avatar.path %}
-        self.image = pygame.image.load("{{ m.player.avatar.path }}")
+        width = 40
+        height = 80
+        self.image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest2.PNG")
         self.image = pygame.transform.scale(self.image, (width, height))
-    {%- else %}
-        self.image = pygame.Surface([width, height])
-        self.image.fill({{ m.player.avatar.color.upper() }})
-    {%- endif %}
 
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
@@ -209,21 +204,18 @@ class SpeedBoost(pygame.sprite.Sprite):
     def picked_up(self):
         self.kill()
 
-{%  for l in m.levels %}
 
-class {{ l.name }}(Level):
-    """ Definition for level {{ l.name }}. """
+
+class Level1(Level):
+    """ Definition for level Level1. """
 
     def __init__(self, player):
         """ Create level. """
 
         # Call the parent constructor
         Level.__init__(self, player)
-
-    {%- if l.background %}
-        self.background = pygame.image.load("{{ l.background.path }}")
+        self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee3.PNG")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-    {%- endif %}
 
         self.level_limit = -1000
 
@@ -240,7 +232,33 @@ class {{ l.name }}(Level):
             block.rect.y = platform[3]
             block.player = self.player
             self.platform_list.add(block)
-{%- endfor %}
+
+class Level2(Level):
+    """ Definition for level Level2. """
+
+    def __init__(self, player):
+        """ Create level. """
+
+        # Call the parent constructor
+        Level.__init__(self, player)
+        self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee1.PNG")
+        self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.level_limit = -1000
+
+        # Array with width, height, x, and y of platform
+        level = [[210, 70, 500, 500],
+                 [210, 70, 200, 400],
+                 [210, 70, 600, 300],
+                 ]
+
+        # Go through the array above and add platforms
+        for platform in level:
+            block = Platform(platform[0], platform[1])
+            block.rect.x = platform[2]
+            block.rect.y = platform[3]
+            block.player = self.player
+            self.platform_list.add(block)
 
 def main():
     """ Main Program """
@@ -257,9 +275,9 @@ def main():
 
     # Create all the levels
     level_list = []
-    {% for l in m.levels %}
-    level_list.append({{ l.name }}(player))
-    {%- endfor %}
+    
+    level_list.append(Level1(player))
+    level_list.append(Level2(player))
 
     # Set the current level
     current_level_no = 0

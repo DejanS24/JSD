@@ -34,6 +34,11 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+GAME_TITLE = "Side scrolling platformer"
+FONT_NAME = "arial"
+DEFAULT_COLOR = BLACK
+FPS = 60
+
 
 class Player(pygame.sprite.Sprite):
     """
@@ -50,12 +55,19 @@ class Player(pygame.sprite.Sprite):
         # Call the parent's constructor
         super().__init__()
 
+        # self.game = game
+        self.walking = False
+
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
         width = 40
         height = 60
-        self.image = pygame.Surface([width, height])
-        self.image.fill(RED)
+
+        # self.image = pygame.Surface([width, height])
+        # self.image.fill(RED)
+
+        self.image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
+        self.image = pygame.transform.scale(self.image, (width, height))
 
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
@@ -141,6 +153,13 @@ class Player(pygame.sprite.Sprite):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
 
+    def animate(self):
+        now = pygame.time.get_ticks()
+        if self.vel.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+
     def pickup_boost(self, target):
         hitbox = self.rect.inflate(-5, -5)
         return hitbox.colliderect(target.rect)
@@ -176,6 +195,8 @@ class Level():
         self.enemy_list = pygame.sprite.Group()
         self.player = player
 
+        self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee3.PNG")
+
         # How far this world has been scrolled left/right
         self.world_shift = 0
 
@@ -193,7 +214,10 @@ class Level():
         """ Draw everything on this level. """
 
         # Draw the background
-        screen.fill(BLUE)
+        if self.background:
+            screen.blit(self.background, (0, 0))
+        else:
+            screen.f(BLUE)
 
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
@@ -242,8 +266,8 @@ class Level_01(Level):
 
         self.level_limit = -1000
 
-        self.boost.rect.x = 520
-        self.boost.rect.y = 350
+        self.boost.rect.x = 220
+        self.boost.rect.y = 320
 
         # Array with width, height, x, and y of platform
         level = [[210, 70, 500, 500],
@@ -290,6 +314,81 @@ class Level_02(Level):
             block.rect.y = platform[3]
             block.player = self.player
             self.platform_list.add(block)
+
+
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption(GAME_TITLE)
+        self.clock = pygame.time.Clock()
+        self.running = True
+        self.playing = False
+        self.font_name = pygame.font.match_font(FONT_NAME)
+
+    def new(self):
+        self.score = 0
+
+        self.playing = Player(self)
+        self.level_list = []
+        self.level_list.append(Level_01(self.player))
+        self.level_list.append(Level_02(self.player))
+
+        self.current_level_no = 0
+        self.current_level = self.level_list[self.current_level_no]
+        self.run()
+
+    def run(self):
+        self.playing = True
+        while self.playing:
+            self.clock.tick(FPS)
+            self.events()
+            self.update()
+            self.draw()
+
+    def update(self):
+        pass
+
+    def events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or \
+              (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                if self.playing:
+                    self.playing = False
+                self.running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.player.jump()
+
+    def show_end_screen(self):
+        if not self.running:
+            return
+        self.screen.fill(DEFAULT_COLOR)
+        self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        self.draw_text("Score: " + str(self.score), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.draw_text("Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+
+        pygame.display.flip()
+        self.wait_for_key()
+
+    def wait_for_key(self):
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or \
+                  (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    waiting = False
+                    self.running = False
+                if event.type == pygame.KEYUP:
+                    waiting = False
+
+    def draw_text(self, text, size, color, x, y):
+        font = pygame.font.Font(self.font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (x, y)
+        self.screen.blit(text_surface, text_rect)
 
 
 def main():
@@ -342,7 +441,7 @@ def main():
                     current_level.boost.picked_up()
                     # current_level.boost.remove([active_sprite_list])
                     # active_sprite_list.remove(current_level.boost)
-                
+
                 if event.key == pygame.K_LEFT:
                     player.go_left()
                 if event.key == pygame.K_RIGHT:
@@ -369,9 +468,9 @@ def main():
             current_level.shift_world(-diff)
 
         # If the player gets near the left side, shift the world right (+x)
-        if player.rect.left <= 120:
-            diff = 120 - player.rect.left
-            player.rect.left = 120
+        if player.rect.left <= 20:
+            diff = 20 - player.rect.left
+            player.rect.left = 20
             current_level.shift_world(diff)
 
         # If the player gets to the end of the level, go to the next level

@@ -4,14 +4,19 @@ Game:
   player=Player
   items*=Item
   levels+=Level
+  sounds*=Sound
 ;
 
 Player:
   "player" "{"
-    ( Image | Color)
+    avatar=Avatar
     "height" height=INT
     "width" width=INT
   "}"
+;
+
+Avatar:
+  ( Image | Color)
 ;
 
 Image:
@@ -21,6 +26,7 @@ Image:
 Color:
   "color" color=WORD
 ;
+
 Item:
   Boost | Point
 ;
@@ -39,8 +45,13 @@ Point:
 
 Level:
   "level" name=ID "{"
+    background=Background
     platforms+=Platform
   "}"
+;
+
+Background:
+  "background" ( Image | Color )
 ;
 
 Platform:

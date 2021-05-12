@@ -1,9 +1,11 @@
-game "Test"
+game "Test igrica"
+
+"Ovo je igrica platformemem la"
 
 player {
-  color red
-  height 150
-  width 150
+  image "C:/Users/Dejan/Pictures/spriteTest2.PNG"
+  height 80
+  width 40
 }
 
 boost Speed {
@@ -15,6 +17,7 @@ point {
 }
 
 level Level1 {
+  background image "C:/Users/Dejan/Pictures/boujee3.PNG"
   platform {
     position 120 120
     height 100
@@ -23,6 +26,7 @@ level Level1 {
 }
 
 level Level2 {
+  background image "C:/Users/Dejan/Pictures/boujee1.PNG"
   platform {
     position 120 120
     height 100
