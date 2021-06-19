@@ -10,6 +10,12 @@ colors = [
     "white"
 ]
 
+default_screen_width = 800
+default_screen_height = 600
+default_font = "arial"
+default_color = "black"
+default_fps = 60
+
 
 def pygame_sl_model_processor(model, metamodel):
     
@@ -19,3 +25,5 @@ def pygame_sl_model_processor(model, metamodel):
     for level in model.levels:
         print(level)
 
+    for setting in model.settings:
+        print(setting)

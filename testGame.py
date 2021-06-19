@@ -160,6 +160,8 @@ class Player(pygame.sprite.Sprite):
         else:
             self.walking = False
 
+
+
     def pickup_boost(self, target):
         hitbox = self.rect.inflate(-5, -5)
         return hitbox.colliderect(target.rect)
@@ -193,6 +195,7 @@ class Level():
             platforms collide with the player. """
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
+        self.pickups = pygame.sprite.Group()
         self.player = player
 
         self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee3.PNG")
@@ -201,6 +204,7 @@ class Level():
         self.world_shift = 0
 
         self.boost = SpeedBoost()
+
         # self.boost.rect.x = 400
         # self.boost.rect.y = 200
 
@@ -328,7 +332,7 @@ class Game:
 
     def new(self):
         self.score = 0
-
+        self.all_sprites = pygame.sprite.LayeredUpdates()
         self.playing = Player(self)
         self.level_list = []
         self.level_list.append(Level_01(self.player))
@@ -391,7 +395,25 @@ class Game:
         self.screen.blit(text_surface, text_rect)
 
 
+def show_end_screen(screen):
+    screen.fill(DEFAULT_COLOR)
+    draw_text(screen, "GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+    draw_text(screen, "Score: " + str(24), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    draw_text(screen, "Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+
+    pygame.display.flip()
+
+
+def draw_text(screen, text, size, color, x, y):
+    font = pygame.font.Font(pygame.font.match_font('arial'), size)
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    screen.blit(text_surface, text_rect)
+
+
 def main():
+
     """ Main Program """
     pygame.init()
 
@@ -481,6 +503,8 @@ def main():
                 current_level_no += 1
                 current_level = level_list[current_level_no]
                 player.level = current_level
+            else:
+                show_end_screen(screen)
 
         # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
         current_level.draw(screen)
@@ -498,5 +522,14 @@ def main():
     # on exit.
     pygame.quit()
 
+
 if __name__ == "__main__":
     main()
+
+    # g = Game()
+    # # show start screen
+    # while g.running:
+    #     g.new()
+    #     g.show_end_screen()
+    #
+    # pygame.quit()

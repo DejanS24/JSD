@@ -10,8 +10,13 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
 # Screen dimensions
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = {{ m.settings.screen_width }}
+SCREEN_HEIGHT = {{ m.settings.screen_height }}
+
+GAME_TITLE = {{ m.settings.title }}
+FONT_NAME = {{ m.settings.font }}
+DEFAULT_COLOR = {{ m.settings.default_color }}
+FPS = {{ m.settings.fps }}
 
 # {{ m.name}}
 class Player(pygame.sprite.Sprite):
