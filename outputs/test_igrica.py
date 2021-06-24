@@ -13,6 +13,11 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+GAME_TITLE = 'Test igrica'
+FONT_NAME = 'arial'
+DEFAULT_COLOR = BLACK
+FPS = 60
+
 # Test igrica
 class Player(pygame.sprite.Sprite):
     """ This class represents the bar at the bottom that the player
@@ -31,6 +36,8 @@ class Player(pygame.sprite.Sprite):
         height = 80
         self.image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest2.PNG")
         self.image = pygame.transform.scale(self.image, (width, height))
+
+        self.movespeed = 6
 
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
@@ -106,15 +113,22 @@ class Player(pygame.sprite.Sprite):
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
-        self.change_x = -6
+        self.change_x = - self.movespeed
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        self.change_x = 6
+        self.change_x = self.movespeed
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
+    
+    def animate(self):
+        now = pygame.time.get_ticks()
+        if self.vel.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
 
 
 class Platform(pygame.sprite.Sprite):
@@ -260,6 +274,40 @@ class Level2(Level):
             block.player = self.player
             self.platform_list.add(block)
 
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption(GAME_TITLE)
+        self.clock = pygame.time.Clock()
+        self.running = True
+        self.playing = False
+        self.font_name = pygame.font.match_font(FONT_NAME)
+
+    def new(self):
+        pass
+
+    def run(self):
+        pass
+
+    def event(self):
+        pass
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pass
+
+    def show_end_screen(self):
+        pass
+
+    def wait_for_key(self):
+        pass
+
+    def draw_text(self, text, size, color, x, y):
+        pass
+
 def main():
     """ Main Program """
     pygame.init()
@@ -362,4 +410,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    g = Game()
+    # show start screen
+    while g.running:
+        g.new()
+        g.show_end_screen()
+
+    pygame.quit()

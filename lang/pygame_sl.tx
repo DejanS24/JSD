@@ -4,7 +4,7 @@ Game:
   player=Player
   items*=Item
   levels+=Level
-  settings*=Setting
+  (settings=Setting)?
 ;
 
 Player:
@@ -16,7 +16,14 @@ Player:
 ;
 
 Avatar:
-  ( Image | Color)
+  ( ImageAvatar | Color)
+;
+
+ImageAvatar:
+  default=Image
+  ("walk" walkingImage=Image)?
+  ("idle" idleImage=Image)?
+  ("jump" jumpingImage=Image)?
 ;
 
 Image:

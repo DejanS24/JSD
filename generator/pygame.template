@@ -13,9 +13,9 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = {{ m.settings.screen_width }}
 SCREEN_HEIGHT = {{ m.settings.screen_height }}
 
-GAME_TITLE = {{ m.settings.title }}
-FONT_NAME = {{ m.settings.font }}
-DEFAULT_COLOR = {{ m.settings.default_color }}
+GAME_TITLE = '{{ m.settings.title or m.name }}'
+FONT_NAME = '{{ m.settings.font }}'
+DEFAULT_COLOR = {{ m.settings.color|upper }}
 FPS = {{ m.settings.fps }}
 
 # {{ m.name}}
@@ -34,13 +34,15 @@ class Player(pygame.sprite.Sprite):
         # This could also be an image loaded from the disk.
         width = {{ m.player.width }}
         height = {{ m.player.height }}
-    {%- if m.player.avatar.path %}
-        self.image = pygame.image.load("{{ m.player.avatar.path }}")
+    {%- if m.player.avatar.default.path %}
+        self.image = pygame.image.load("{{ m.player.avatar.default.path }}")
         self.image = pygame.transform.scale(self.image, (width, height))
     {%- else %}
         self.image = pygame.Surface([width, height])
         self.image.fill({{ m.player.avatar.color.upper() }})
     {%- endif %}
+
+        self.movespeed = {{ m.settings.movespeed }}
 
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
@@ -116,15 +118,54 @@ class Player(pygame.sprite.Sprite):
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
-        self.change_x = -6
+        self.change_x = - self.movespeed
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        self.change_x = 6
+        self.change_x = self.movespeed
 
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
+
+    {%- if m.player.avatar.default.path %}
+    {% set animate_lvl = m.player.avatar|animation_level %}
+    def animate(self):
+        now = pygame.time.get_ticks()
+        if self.vel.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+    {%- if 'walk' in animate_lvl %}
+        # show walk animation
+        if self.walking:
+            if now - self.last_update > 180:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
+                bottom = self.rect.bottom
+                if self.vel.x > 0:
+                    self.image = self.walk_frames_r[self.current_frame]
+                else:
+                    self.image = self.walk_frames_l[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+    {%- endif %}
+    {%- if 'idle' in animate_lvl %}
+        # show walk animation
+        if self.walking == False:
+            if now - self.last_update > 180:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
+                bottom = self.rect.bottom
+                if self.vel.x > 0:
+                    self.image = self.walk_frames_r[self.current_frame]
+                else:
+                    self.image = self.walk_frames_l[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+    {%- endif %}
+
+    {%- endif %}
 
 
 class Platform(pygame.sprite.Sprite):
@@ -247,6 +288,40 @@ class {{ l.name }}(Level):
             self.platform_list.add(block)
 {%- endfor %}
 
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption(GAME_TITLE)
+        self.clock = pygame.time.Clock()
+        self.running = True
+        self.playing = False
+        self.font_name = pygame.font.match_font(FONT_NAME)
+
+    def new(self):
+        pass
+
+    def run(self):
+        pass
+
+    def event(self):
+        pass
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pass
+
+    def show_end_screen(self):
+        pass
+
+    def wait_for_key(self):
+        pass
+
+    def draw_text(self, text, size, color, x, y):
+        pass
+
 def main():
     """ Main Program """
     pygame.init()
@@ -349,4 +424,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    g = Game()
+    # show start screen
+    while g.running:
+        g.new()
+        g.show_end_screen()
+
+    pygame.quit()

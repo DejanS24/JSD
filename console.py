@@ -1,8 +1,8 @@
 import sys
 import argparse
 import re
-from pygame_sl.generator import generate
-from pygame_sl.lang.pglang import pygame_sl_mm
+from generator import generate
+from lang.pglang import pygame_sl_mm
 
 
 def pygame_sl():
@@ -19,20 +19,20 @@ def pygame_sl():
 
     args = parser.parse_args()
 
-    try:
-        model = pygame_sl_mm.model_from_file(args.model)
-    except Exception as e:
-        print(e)
-        return
+    # try:
+    model = pygame_sl_mm.model_from_file(args.model)
+    # except Exception as e:
+    #     print(e)
+    #     return
 
     print("Generating code for target")
-    try:
-        generate(model)
-    except Exception as e:
-        print(str(e))
-        return
-    finally:
-        print("Done")
+    # try:
+    generate(model)
+    # except Exception as e:
+    #     print(str(e))
+    #     return
+    # finally:
+    #     print("Done")
 
 
 if __name__ == '__main__':
