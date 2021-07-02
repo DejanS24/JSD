@@ -386,10 +386,6 @@ class Game:
 
     def events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or \
-                    (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                done = True
-
             if event.type == pygame.KEYDOWN:
                 if self.player.pickup_boost(self.current_level.boost):
                     self.player.speed_boost()
@@ -435,7 +431,6 @@ class Game:
             self.player.rect.right = 500
             self.current_level.shift_world(-diff)
 
-        print(self.current_level.world_shift)
         # If the player gets near the left side, shift the world right (+x)
         if self.player.rect.left <= 20 and self.current_level.world_shift > 20:
             self.player.rect.left = 20

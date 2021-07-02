@@ -40,20 +40,25 @@ Item:
 
 Boost:
   "boost" name=ID "{"
-    ( Image | Color)
+    avatar=ItemAvatar
   "}"
 ;
 
 Point:
-  "point" "{"
-    ( Image | Color)
+  "point" name=ID "{"
+    avatar=ItemAvatar
   "}"
+;
+
+ItemAvatar:
+  Image | Color
 ;
 
 Level:
   "level" name=ID "{"
     background=Background
     platforms+=Platform
+    items*=ItemReference
   "}"
 ;
 
@@ -66,6 +71,22 @@ Platform:
     "position" x=INT y=INT
     "height" height=INT
     "width" width=INT
+  "}"
+;
+
+ItemReference:
+  BoostInstance | PointInstance
+;
+
+BoostInstance:
+  "boost" type=[Boost] "{"
+    "position" x=INT y=INT
+  "}"
+;
+
+PointInstance:
+  "point" type=[Point] "{"
+    "position" x=INT y=INT
   "}"
 ;
 
