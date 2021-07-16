@@ -40,35 +40,28 @@ Item:
 
 Boost:
   "boost" name=ID "{"
-    avatar=ItemAvatar
+    avatar=ImageOrColor
   "}"
 ;
 
 Point:
   "point" name=ID "{"
-    avatar=ItemAvatar
+    avatar=ImageOrColor
   "}"
-;
-
-ItemAvatar:
-  Image | Color
 ;
 
 Level:
   "level" name=ID "{"
-    background=Background
+    "background" background=ImageOrColor
     platforms+=Platform
     items*=ItemReference
   "}"
 ;
 
-Background:
-  "background" ( Image | Color )
-;
-
 Platform:
   "platform" "{"
     "position" x=INT y=INT
+    ("texture" texture=ImageOrColor)?
     "height" height=INT
     "width" width=INT
   "}"
@@ -101,6 +94,10 @@ Setting:
     )+
 
   "}"
+;
+
+ImageOrColor:
+  Image | Color
 ;
 
 WORD:

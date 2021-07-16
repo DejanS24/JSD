@@ -20,6 +20,7 @@ level Level1 {
   background image "C:/Users/Dejan/Pictures/boujee3.PNG"
   platform {
     position 120 120
+    texture image "C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg"
     height 100
     width 370
   }

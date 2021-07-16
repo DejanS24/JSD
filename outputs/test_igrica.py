@@ -24,12 +24,13 @@ class Player(pygame.sprite.Sprite):
         controls. """
 
     # -- Methods
-    def __init__(self):
+    def __init__(self, game):
         """ Constructor function """
 
         # Call the parent's constructor
         super().__init__()
 
+        self.game = game
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
         width = 40
@@ -83,6 +84,10 @@ class Player(pygame.sprite.Sprite):
 
             # Stop our vertical movement
             self.change_y = 0
+
+        pickups_hit_list = pygame.sprite.spritecollide(self, self.level.pickups, False)
+        for pickup in pickups_hit_list:
+            pickup.picked_up()
 
     def calc_grav(self):
         """ Calculate effect of gravity. """
@@ -146,6 +151,35 @@ class Platform(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
 
+class Item(pygame.sprite.Sprite):
+
+    def __init__(self, player, color=WHITE):
+        super().__init__()
+
+        self.player = player
+        width = 30
+        height = 30
+        self.image = pygame.Surface([width, height])
+        self.image.fill(color)
+
+        self.rect = self.image.get_rect()
+
+    def picked_up(self):
+        self.kill()
+
+
+class SpeedBoost(Item):
+    def picked_up(self):
+        super().picked_up()
+        self.player.movespeed = 20
+
+
+class Point(Item):
+    def picked_up(self):
+        super().picked_up()
+        self.player.game.score += 10
+
+
 
 class Level(object):
     """ This is a generic super-class used to define a level.
@@ -166,7 +200,7 @@ class Level(object):
         # How far this world has been scrolled left/right
         self.world_shift = 0
 
-        self.boost = SpeedBoost()
+        # self.boost = SpeedBoost()
         # self.boost.rect.x = 400
         # self.boost.rect.y = 200
 
@@ -176,6 +210,7 @@ class Level(object):
         """ Update everything in this level."""
         self.platform_list.update()
         self.enemy_list.update()
+        self.pickups.update()
 
     def draw(self, screen):
         """ Draw everything on this level. """
@@ -189,6 +224,7 @@ class Level(object):
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
+        self.pickups.draw(screen)
 
     def shift_world(self, shift_x):
         """ When the user moves left/right and we need to scroll
@@ -204,21 +240,8 @@ class Level(object):
         for enemy in self.enemy_list:
             enemy.rect.x += shift_x
 
-
-class SpeedBoost(pygame.sprite.Sprite):
-
-    def __init__(self):
-        super().__init__()
-
-        width = 30
-        height = 30
-        self.image = pygame.Surface([width, height])
-        self.image.fill(WHITE)
-
-        self.rect = self.image.get_rect()
-
-    def picked_up(self):
-        self.kill()
+        for pickup in self.pickups:
+            pickup.rect.x += shift_x
 
 
 
@@ -232,6 +255,11 @@ class Level1(Level):
         Level.__init__(self, player)
         self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee3.PNG")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.item1 = SpeedBoost(self.player)
+        self.item1.rect.x = 120
+        self.item1.rect.y = 150
+        self.pickups.add(self.item1)
+    
 
         self.level_limit = -1000
 
@@ -289,7 +317,7 @@ class Game:
     def new(self):
         self.score = 0
         self.all_sprites = pygame.sprite.LayeredUpdates()
-        self.player = Player()
+        self.player = Player(self)
         self.all_sprites.add(self.player)
         self.level_list = []
     
@@ -312,9 +340,6 @@ class Game:
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if self.player.pickup_boost(self.current_level.boost):
-                    self.player.speed_boost()
-                    self.current_level.boost.picked_up()
                 if event.key == pygame.K_ESCAPE:
                     self.playing = False
                     self.running = False
@@ -355,6 +380,7 @@ class Game:
         current_position = self.player.rect.x + self.current_level.world_shift
         if current_position < self.current_level.level_limit:
             self.player.rect.x = 120
+            self.score += 30
             if self.current_level_no < len(self.level_list)-1:
                 self.current_level_no += 1
                 self.current_level = self.level_list[self.current_level_no]
@@ -376,7 +402,7 @@ class Game:
             return
         self.screen.fill(DEFAULT_COLOR)
         self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
-        #self.draw_text("Score: " + str(self.score), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.draw_text("Score: " + str(self.score), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.draw_text("Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
 
         pygame.display.flip()
@@ -400,106 +426,6 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x, y)
         self.screen.blit(text_surface, text_rect)
-
-def main():
-    """ Main Program """
-    pygame.init()
-
-    # Set the height and width of the screen
-    size = [SCREEN_WIDTH, SCREEN_HEIGHT]
-    screen = pygame.display.set_mode(size)
-
-    pygame.display.set_caption("Platformer Jumper")
-
-    # Create the player
-    player = Player()
-
-    # Create all the levels
-    level_list = []
-    
-    level_list.append(Level1(player))
-    level_list.append(Level2(player))
-
-    # Set the current level
-    current_level_no = 0
-    current_level = level_list[current_level_no]
-
-    active_sprite_list = pygame.sprite.Group()
-    player.level = current_level
-
-    player.rect.x = 340
-    player.rect.y = SCREEN_HEIGHT - player.rect.height
-    active_sprite_list.add(player)
-
-    # Loop until the user clicks the close button.
-    done = False
-
-    # Used to manage how fast the screen updates
-    clock = pygame.time.Clock()
-
-    # -------- Main Program Loop -----------
-    while not done:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or \
-             (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                done = True
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    player.go_left()
-                if event.key == pygame.K_RIGHT:
-                    player.go_right()
-                if event.key == pygame.K_UP:
-                    player.jump()
-
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT and player.change_x < 0:
-                    player.stop()
-                if event.key == pygame.K_RIGHT and player.change_x > 0:
-                    player.stop()
-
-        # Update the player.
-        active_sprite_list.update()
-
-        # Update items in the level
-        current_level.update()
-
-        # If the player gets near the right side, shift the world left (-x)
-        if player.rect.right >= 500:
-            diff = player.rect.right - 500
-            player.rect.right = 500
-            current_level.shift_world(-diff)
-
-        # If the player gets near the left side, shift the world right (+x)
-        if player.rect.left <= 120:
-            diff = 120 - player.rect.left
-            player.rect.left = 120
-            current_level.shift_world(diff)
-
-        # If the player gets to the end of the level, go to the next level
-        current_position = player.rect.x + current_level.world_shift
-        if current_position < current_level.level_limit:
-            player.rect.x = 120
-            if current_level_no < len(level_list)-1:
-                current_level_no += 1
-                current_level = level_list[current_level_no]
-                player.level = current_level
-
-        # ALL CODE TO DRAW SHOULD GO BELOW THIS COMMENT
-        current_level.draw(screen)
-        active_sprite_list.draw(screen)
-
-        # ALL CODE TO DRAW SHOULD GO ABOVE THIS COMMENT
-
-        # Limit to 60 frames per second
-        clock.tick(60)
-
-        # Go ahead and update the screen with what we've drawn.
-        pygame.display.flip()
-
-    # Be IDLE friendly. If you forget this line, the program will 'hang'
-    # on exit.
-    pygame.quit()
 
 
 if __name__ == "__main__":
