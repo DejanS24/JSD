@@ -3,7 +3,7 @@ game "Test igrica"
 "Ovo je igrica platformemem la"
 
 player {
-  image "C:/Users/Dejan/Pictures/spriteTest2.PNG"
+  image "C:/Users/Dejan/Pictures/spriteTest3.PNG"
   height 80
   width 40
 }
@@ -12,7 +12,7 @@ boost Speed {
   color green
 }
 
-point {
+point one {
   color yellow
 }
 
@@ -20,8 +20,12 @@ level Level1 {
   background image "C:/Users/Dejan/Pictures/boujee3.PNG"
   platform {
     position 120 120
+    texture image "C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg"
     height 100
     width 370
+  }
+  boost Speed {
+    position 120 150
   }
 }
 

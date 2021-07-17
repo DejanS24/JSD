@@ -4,7 +4,7 @@ Game:
   player=Player
   items*=Item
   levels+=Level
-  sounds*=Sound
+  (settings=Setting)?
 ;
 
 Player:
@@ -16,7 +16,14 @@ Player:
 ;
 
 Avatar:
-  ( Image | Color)
+  ( ImageAvatar | Color)
+;
+
+ImageAvatar:
+  default=Image
+  ("walk" walkingImage=Image)?
+  ("idle" idleImage=Image)?
+  ("jump" jumpingImage=Image)?
 ;
 
 Image:
@@ -33,33 +40,64 @@ Item:
 
 Boost:
   "boost" name=ID "{"
-    ( Image | Color)
+    avatar=ImageOrColor
   "}"
 ;
 
 Point:
-  "point" "{"
-    ( Image | Color)
+  "point" name=ID "{"
+    avatar=ImageOrColor
   "}"
 ;
 
 Level:
   "level" name=ID "{"
-    background=Background
+    "background" background=ImageOrColor
     platforms+=Platform
+    items*=ItemReference
   "}"
-;
-
-Background:
-  "background" ( Image | Color )
 ;
 
 Platform:
   "platform" "{"
     "position" x=INT y=INT
+    ("texture" texture=ImageOrColor)?
     "height" height=INT
     "width" width=INT
   "}"
+;
+
+ItemReference:
+  BoostInstance | PointInstance
+;
+
+BoostInstance:
+  "boost" type=[Boost] "{"
+    "position" x=INT y=INT
+  "}"
+;
+
+PointInstance:
+  "point" type=[Point] "{"
+    "position" x=INT y=INT
+  "}"
+;
+
+Setting:
+  "settings" "{"
+    ("title" title=STRING |
+     "fps" fps=INT |
+     "default color" default_color=STRING |
+     "font name" font=STRING |
+     "screen width" screen_width=INT |
+     "screen height" screen_height=INT
+    )+
+
+  "}"
+;
+
+ImageOrColor:
+  Image | Color
 ;
 
 WORD:

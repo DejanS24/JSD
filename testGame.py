@@ -49,27 +49,33 @@ class Player(pygame.sprite.Sprite):
     buff_timer = 5
 
     # -- Methods
-    def __init__(self):
+    def __init__(self, game):
         """ Constructor function """
 
         # Call the parent's constructor
         super().__init__()
-
-        # self.game = game
+        self.game = game
         self.walking = False
+        self.jumping = False
+        self.current_frame = 0
+        self.last_update = 0
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = 40
-        height = 60
+        self.width = 40
+        self.height = 60
 
         # self.image = pygame.Surface([width, height])
         # self.image.fill(RED)
 
-        self.image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.default_image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
+        self.idle_image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest4.PNG")
+        self.jumping_image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest5.PNG")
+        self.image = pygame.transform.scale(self.default_image, (self.width, self.height))
 
-        # Set a referance to the image rect.
+        self.standing_frames = [self.default_image, self.idle_image]
+
+        # Set a reference to the image rect.
         self.rect = self.image.get_rect()
 
         # Set speed vector of player
@@ -81,6 +87,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         """ Move the player. """
+        self.animate()
         # Gravity
         self.calc_grav()
 
@@ -113,6 +120,10 @@ class Player(pygame.sprite.Sprite):
 
             # Stop our vertical movement
             self.change_y = 0
+
+        pickups_hit_list = pygame.sprite.spritecollide(self, self.level.pickups, False)
+        for pickup in pickups_hit_list:
+            pickup.picked_up()
 
     def calc_grav(self):
         """ Calculate effect of gravity. """
@@ -155,35 +166,71 @@ class Player(pygame.sprite.Sprite):
 
     def animate(self):
         now = pygame.time.get_ticks()
-        if self.vel.x != 0:
+        if self.change_x != 0:
             self.walking = True
         else:
             self.walking = False
 
-    def pickup_boost(self, target):
-        hitbox = self.rect.inflate(-5, -5)
-        return hitbox.colliderect(target.rect)
+        if self.change_y != 0:
+            self.jumping = True
+        else:
+            self.jumping = False
 
-    def speed_boost(self):
-        self.movespeed = 20
+        # show walk animation
+        if self.walking or (not self.jumping and not self.walking):
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                x_c = self.rect.x
+                self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+                self.rect.x = x_c
+    #
+        if self.jumping:
+            bottom = self.rect.bottom
+            x_c = self.rect.x
+            self.image = pygame.transform.scale(self.jumping_image, (self.width, self.height))
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+            self.rect.x = x_c
+
+        # show idle animation
+        # if not self.jumping and not self.walking:
+        #     if now - self.last_update > 350:
+        #         self.last_update = now
+        #         self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+        #         bottom = self.rect.bottom
+        #         x_c = self.rect.x
+        #         self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
+        #         self.rect = self.image.get_rect()
+        #         self.rect.bottom = bottom
+        #         self.rect.x = x_c
+        # self.mask = pygame.mask.from_surface(self.image)
+    #
 
 
 class Platform(pygame.sprite.Sprite):
     """ Platform the user can jump on """
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, image=None):
         """ Platform constructor. Assumes constructed with user passing in
             an array of 5 numbers like what's defined at the top of this code.
             """
         super().__init__()
 
         self.image = pygame.Surface([width, height])
-        self.image.fill(GREEN)
+        if image:
+            img = pygame.image.load(image)
+            self.image = pygame.transform.scale(img, (width, height))
+        else:
+            self.image.fill(GREEN)
 
         self.rect = self.image.get_rect()
 
 
-class Level():
+class Level:
     """ This is a generic super-class used to define a level.
         Create a child class for each level with level-specific
         info. """
@@ -193,6 +240,7 @@ class Level():
             platforms collide with the player. """
         self.platform_list = pygame.sprite.Group()
         self.enemy_list = pygame.sprite.Group()
+        self.pickups = pygame.sprite.Group()
         self.player = player
 
         self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee3.PNG")
@@ -200,7 +248,8 @@ class Level():
         # How far this world has been scrolled left/right
         self.world_shift = 0
 
-        self.boost = SpeedBoost()
+        self.boost = SpeedBoost(player)
+
         # self.boost.rect.x = 400
         # self.boost.rect.y = 200
 
@@ -209,6 +258,7 @@ class Level():
         """ Update everything in this level."""
         self.platform_list.update()
         self.enemy_list.update()
+        self.pickups.update()
 
     def draw(self, screen):
         """ Draw everything on this level. """
@@ -222,6 +272,7 @@ class Level():
         # Draw all the sprite lists that we have
         self.platform_list.draw(screen)
         self.enemy_list.draw(screen)
+        self.pickups.draw(screen)
 
     def shift_world(self, shift_x):
         """ When the user moves left/right and we need to scroll
@@ -237,21 +288,37 @@ class Level():
         for enemy in self.enemy_list:
             enemy.rect.x += shift_x
 
+        for pickup in self.pickups:
+            pickup.rect.x += shift_x
 
-class SpeedBoost(pygame.sprite.Sprite):
 
-    def __init__(self):
+class Item(pygame.sprite.Sprite):
+
+    def __init__(self, player, color=WHITE):
         super().__init__()
 
+        self.player = player
         width = 30
         height = 30
         self.image = pygame.Surface([width, height])
-        self.image.fill(WHITE)
+        self.image.fill(color)
 
         self.rect = self.image.get_rect()
 
     def picked_up(self):
         self.kill()
+
+
+class SpeedBoost(Item):
+    def picked_up(self):
+        super().picked_up()
+        self.player.movespeed = 20
+
+
+class Point(Item):
+    def picked_up(self):
+        super().picked_up()
+        self.player.game.score += 10
 
 
 # Create platforms for the level
@@ -266,8 +333,14 @@ class Level_01(Level):
 
         self.level_limit = -1000
 
-        self.boost.rect.x = 220
+        self.boost.rect.x = 520
         self.boost.rect.y = 320
+        self.pickups.add(self.boost)
+
+        self.point1 = Point(self.player, BLUE)
+        self.point1.rect.x = 600
+        self.point1.rect.y = 200
+        self.pickups.add(self.point1)
 
         # Array with width, height, x, and y of platform
         level = [[210, 70, 500, 500],
@@ -278,7 +351,7 @@ class Level_01(Level):
 
         # Go through the array above and add platforms
         for platform in level:
-            block = Platform(platform[0], platform[1])
+            block = Platform(platform[0], platform[1], "C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg")
             block.rect.x = platform[2]
             block.rect.y = platform[3]
             block.player = self.player
@@ -297,8 +370,9 @@ class Level_02(Level):
 
         self.level_limit = -1000
 
-        self.boost.rect.x = 300
+        self.boost.rect.x = 500
         self.boost.rect.y = 300
+        self.pickups.add(self.boost)
 
         # Array with type of platform, and x, y location of the platform.
         level = [[210, 30, 450, 570],
@@ -328,14 +402,16 @@ class Game:
 
     def new(self):
         self.score = 0
-
-        self.playing = Player(self)
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.player = Player(self)
+        self.all_sprites.add(self.player)
         self.level_list = []
         self.level_list.append(Level_01(self.player))
         self.level_list.append(Level_02(self.player))
 
         self.current_level_no = 0
         self.current_level = self.level_list[self.current_level_no]
+        self.player.level = self.current_level
         self.run()
 
     def run(self):
@@ -346,19 +422,75 @@ class Game:
             self.update()
             self.draw()
 
-    def update(self):
-        pass
-
     def events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or \
-              (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                if self.playing:
-                    self.playing = False
-                self.running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_ESCAPE:
+                    self.playing = False
+                    self.running = False
+
+                if event.key == pygame.K_LEFT:
+                    self.player.go_left()
+                if event.key == pygame.K_RIGHT:
+                    self.player.go_right()
+                if event.key == pygame.K_UP:
                     self.player.jump()
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT and self.player.change_x < 0:
+                    self.player.stop()
+                if event.key == pygame.K_RIGHT and self.player.change_x > 0:
+                    self.player.stop()
+
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT or \
+        #             (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+        #         if self.playing:
+        #             self.playing = False
+        #         self.running = False
+        #     if event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_SPACE:
+        #             self.player.jump()
+
+    def update(self):
+        self.all_sprites.update()
+
+        self.current_level.update()
+
+        # If the player gets near the right side, shift the world left (-x)
+        if self.player.rect.right >= 500:
+            diff = self.player.rect.right - 500
+            self.player.rect.right = 500
+            self.current_level.shift_world(-diff)
+
+        # If the player gets near the left side, shift the world right (+x)
+        if self.player.rect.left <= 20 and self.current_level.world_shift > 20:
+            self.player.rect.left = 20
+        elif self.player.rect.left <= 20 and self.current_level.world_shift < 25:
+            diff = 20 - self.player.rect.left
+            self.player.rect.left = 20
+            self.current_level.shift_world(diff)
+
+        # If the player gets to the end of the level, go to the next level
+        current_position = self.player.rect.x + self.current_level.world_shift
+        if current_position < self.current_level.level_limit:
+            self.player.rect.x = 120
+            self.score += 30
+            if self.current_level_no < len(self.level_list)-1:
+                self.current_level_no += 1
+                self.current_level = self.level_list[self.current_level_no]
+                self.player.level = self.current_level
+            else:
+                self.playing = False
+
+    def draw(self):
+        self.current_level.draw(self.screen)
+        self.all_sprites.draw(self.screen)
+
+        #draw score
+        self.draw_text(str(self.score), 22, WHITE, SCREEN_WIDTH / 2, 15)
+
+        pygame.display.flip()
 
     def show_end_screen(self):
         if not self.running:
@@ -366,7 +498,7 @@ class Game:
         self.screen.fill(DEFAULT_COLOR)
         self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
         self.draw_text("Score: " + str(self.score), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-        self.draw_text("Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+        self.draw_text("Press SPACE to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
 
         pygame.display.flip()
         self.wait_for_key()
@@ -380,7 +512,7 @@ class Game:
                   (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     waiting = False
                     self.running = False
-                if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     waiting = False
 
     def draw_text(self, text, size, color, x, y):
@@ -392,6 +524,7 @@ class Game:
 
 
 def main():
+
     """ Main Program """
     pygame.init()
 
@@ -498,5 +631,14 @@ def main():
     # on exit.
     pygame.quit()
 
+
 if __name__ == "__main__":
-    main()
+    # main()
+
+    g = Game()
+    # show start screen
+    while g.running:
+        g.new()
+        g.show_end_screen()
+
+    pygame.quit()

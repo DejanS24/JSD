@@ -1,8 +1,8 @@
 import sys
 import argparse
 import re
-from pygame_sl.generator import generate
-from pygame_sl.lang.pglang import pygame_sl_mm
+from generator import generate
+from lang.pglang import pygame_sl_mm
 
 
 def pygame_sl():
