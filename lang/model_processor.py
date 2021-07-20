@@ -15,10 +15,15 @@ defaults = {
     'screen_width': 800,
     'screen_height': 600,
     'font': 'arial',
-    'color': 'black',
+    'default_color': 'black',
     'fps': 60,
-    'movespeed': 6
+    'movespeed': 6,
+    'default_texture_color': 'green'
 }
+
+
+def check_color_existing(key, value):
+     return key.__contains__('color') and value not in colors
 
 
 def set_default_settings(model):
@@ -26,8 +31,12 @@ def set_default_settings(model):
     if not model.settings:
         model.settings = {}
     for key, value in defaults.items():
-        if not key in model.settings:
-            model.settings[key] = value
+        attr_val = getattr(model.settings, key)
+
+        if len(attr_val) == 0 and not check_color_existing(key, attr_val):
+            setattr(model.settings, key, value)
+        else:
+            setattr(model.settings, key, attr_val[0])
 
 
 def pygame_sl_model_processor(model, metamodel):
@@ -37,8 +46,5 @@ def pygame_sl_model_processor(model, metamodel):
 
     for level in model.levels:
         print(level)
-
-    # for setting in model.settings:
-    #     print(setting)
 
     set_default_settings(model)

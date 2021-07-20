@@ -61,7 +61,7 @@ Level:
 Platform:
   "platform" "{"
     "position" x=INT y=INT
-    ("texture" texture=ImageOrColor)?
+    ("texture" texture=Image)?
     "height" height=INT
     "width" width=INT
   "}"
@@ -88,9 +88,11 @@ Setting:
     ("title" title=STRING |
      "fps" fps=INT |
      "default color" default_color=STRING |
+     "default texture color" default_texture_color=STRING |
      "font name" font=STRING |
      "screen width" screen_width=INT |
-     "screen height" screen_height=INT
+     "screen height" screen_height=INT |
+     "movespeed" movespeed=INT
     )+
 
   "}"

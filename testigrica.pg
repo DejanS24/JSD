@@ -17,9 +17,9 @@ point one {
 }
 
 level Level1 {
-  background image "C:/Users/Dejan/Pictures/boujee3.PNG"
+  background image "C:/Users/Dejan/Pictures/game_background12.jpg"
   platform {
-    position 120 120
+    position 420 210
     texture image "C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg"
     height 100
     width 370
@@ -30,10 +30,14 @@ level Level1 {
 }
 
 level Level2 {
-  background image "C:/Users/Dejan/Pictures/boujee1.PNG"
+  background image "C:/Users/Dejan/Pictures/game_background13.jpg"
   platform {
-    position 120 120
+    position 420 415
     height 100
     width 370
   }
+}
+
+settings {
+  default texture color 'pink'
 }

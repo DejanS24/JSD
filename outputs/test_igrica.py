@@ -15,7 +15,7 @@ SCREEN_HEIGHT = 600
 
 GAME_TITLE = 'Test igrica'
 FONT_NAME = 'arial'
-DEFAULT_COLOR = BLACK
+DEFAULT_COLOR = B
 FPS = 60
 
 # Test igrica
@@ -52,6 +52,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         """ Move the player. """
+    
         # Gravity
         self.calc_grav()
 
@@ -127,29 +128,27 @@ class Player(pygame.sprite.Sprite):
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
-    def pickup_boost(self, target):
-        return pygame.sprite.spritecollide(self, self.level.pickups, False)
-    
-    def animate(self):
-        now = pygame.time.get_ticks()
-        if self.vel.x != 0:
-            self.walking = True
-        else:
-            self.walking = False
+
 
 class Platform(pygame.sprite.Sprite):
     """ Platform the user can jump on """
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, image=None):
         """ Platform constructor. Assumes constructed with user passing in
             an array of 5 numbers like what's defined at the top of this
             code. """
         super().__init__()
 
         self.image = pygame.Surface([width, height])
-        self.image.fill(GREEN)
+        if image:
+            img = pygame.image.load(image)
+            self.image = pygame.transform.scale(img, (width, height))
+        else:
+            self.image.fill(G)
 
         self.rect = self.image.get_rect()
+
+
 
 class Item(pygame.sprite.Sprite):
 
@@ -253,7 +252,7 @@ class Level1(Level):
 
         # Call the parent constructor
         Level.__init__(self, player)
-        self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee3.PNG")
+        self.background = pygame.image.load("C:/Users/Dejan/Pictures/game_background12.jpg")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.item1 = SpeedBoost(self.player)
         self.item1.rect.x = 120
@@ -262,20 +261,11 @@ class Level1(Level):
     
 
         self.level_limit = -1000
-
-        # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
-                 [210, 70, 200, 400],
-                 [210, 70, 600, 300],
-                 ]
-
-        # Go through the array above and add platforms
-        for platform in level:
-            block = Platform(platform[0], platform[1])
-            block.rect.x = platform[2]
-            block.rect.y = platform[3]
-            block.player = self.player
-            self.platform_list.add(block)
+        platform1 = Platform(370, 100, 'C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg')
+        platform1.rect.x = 420
+        platform1.rect.y = 210
+        self.platform_list.add(platform1)
+    
 
 class Level2(Level):
     """ Definition for level Level2. """
@@ -285,24 +275,15 @@ class Level2(Level):
 
         # Call the parent constructor
         Level.__init__(self, player)
-        self.background = pygame.image.load("C:/Users/Dejan/Pictures/boujee1.PNG")
+        self.background = pygame.image.load("C:/Users/Dejan/Pictures/game_background13.jpg")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.level_limit = -1000
-
-        # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
-                 [210, 70, 200, 400],
-                 [210, 70, 600, 300],
-                 ]
-
-        # Go through the array above and add platforms
-        for platform in level:
-            block = Platform(platform[0], platform[1])
-            block.rect.x = platform[2]
-            block.rect.y = platform[3]
-            block.player = self.player
-            self.platform_list.add(block)
+        platform1 = Platform(370, 100)
+        platform1.rect.x = 420
+        platform1.rect.y = 415
+        self.platform_list.add(platform1)
+    
 
 class Game:
     def __init__(self):

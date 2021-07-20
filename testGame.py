@@ -74,6 +74,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.default_image, (self.width, self.height))
 
         self.standing_frames = [self.default_image, self.idle_image]
+        self.walking_frames = [self.default_image, self.idle_image]
 
         # Set a reference to the image rect.
         self.rect = self.image.get_rect()
@@ -180,10 +181,10 @@ class Player(pygame.sprite.Sprite):
         if self.walking or (not self.jumping and not self.walking):
             if now - self.last_update > 350:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                self.current_frame = (self.current_frame + 1) % len(self.walking_frames)
                 bottom = self.rect.bottom
                 x_c = self.rect.x
-                self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
+                self.image = pygame.transform.scale(self.walking_frames[self.current_frame], (self.width, self.height))
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
                 self.rect.x = x_c
@@ -197,16 +198,16 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = x_c
 
         # show idle animation
-        # if not self.jumping and not self.walking:
-        #     if now - self.last_update > 350:
-        #         self.last_update = now
-        #         self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
-        #         bottom = self.rect.bottom
-        #         x_c = self.rect.x
-        #         self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
-        #         self.rect = self.image.get_rect()
-        #         self.rect.bottom = bottom
-        #         self.rect.x = x_c
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                x_c = self.rect.x
+                self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+                self.rect.x = x_c
         # self.mask = pygame.mask.from_surface(self.image)
     #
 
@@ -354,7 +355,6 @@ class Level_01(Level):
             block = Platform(platform[0], platform[1], "C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg")
             block.rect.x = platform[2]
             block.rect.y = platform[3]
-            block.player = self.player
             self.platform_list.add(block)
 
 
@@ -386,7 +386,6 @@ class Level_02(Level):
             block = Platform(platform[0], platform[1])
             block.rect.x = platform[2]
             block.rect.y = platform[3]
-            block.player = self.player
             self.platform_list.add(block)
 
 

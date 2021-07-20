@@ -15,7 +15,7 @@ SCREEN_HEIGHT = {{ m.settings.screen_height }}
 
 GAME_TITLE = '{{ m.settings.title or m.name }}'
 FONT_NAME = '{{ m.settings.font }}'
-DEFAULT_COLOR = {{ m.settings.color|upper }}
+DEFAULT_COLOR = {{ m.settings.default_color|upper }}
 FPS = {{ m.settings.fps }}
 
 # {{ m.name}}
@@ -57,6 +57,10 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         """ Move the player. """
+    {% set animate_lvl = m.player.avatar|animation_level %}
+    {%- if animate_lvl|length > 1 %}
+        self.animate()
+    {%- endif %}
         # Gravity
         self.calc_grav()
 
@@ -133,64 +137,70 @@ class Player(pygame.sprite.Sprite):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
 
-    {%- if m.items|check_boosts %}
-    def pickup_boost(self, target):
-        return pygame.sprite.spritecollide(self, self.level.pickups, False)
-    {%- endif %}
-
-    {%- if m.player.avatar.default.path %}
-    {% set animate_lvl = m.player.avatar|animation_level %}
+    {%- if animate_lvl|length > 1 %}
     def animate(self):
         now = pygame.time.get_ticks()
-        if self.vel.x != 0:
+        if self.change_x != 0:
             self.walking = True
         else:
             self.walking = False
+
+        if self.change_y != 0:
+            self.jumping = True
+        else:
+            self.jumping = False
+
     {%- if 'walk' in animate_lvl %}
         # show walk animation
         if self.walking:
-            if now - self.last_update > 180:
+            if now - self.last_update > 350:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
                 bottom = self.rect.bottom
-                if self.vel.x > 0:
-                    self.image = self.walk_frames_r[self.current_frame]
-                else:
-                    self.image = self.walk_frames_l[self.current_frame]
+                x_c = self.rect.x
+                self.image = pygame.transform.scale(self.walking_frames[self.current_frame], (self.width, self.height))
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
+                self.rect.x = x_c
     {%- endif %}
     {%- if 'idle' in animate_lvl %}
-        # show walk animation
-        if self.walking == False:
-            if now - self.last_update > 180:
+        # show idle animation
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 350:
                 self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
                 bottom = self.rect.bottom
-                if self.vel.x > 0:
-                    self.image = self.walk_frames_r[self.current_frame]
-                else:
-                    self.image = self.walk_frames_l[self.current_frame]
+                x_c = self.rect.x
+                self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
+                self.rect.x = x_c
+    {%- endif %}
+    {%- if 'jump' in animate_lvl %}
+
     {%- endif %}
     {%- endif %}
+
 
 class Platform(pygame.sprite.Sprite):
     """ Platform the user can jump on """
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, image=None):
         """ Platform constructor. Assumes constructed with user passing in
             an array of 5 numbers like what's defined at the top of this
             code. """
         super().__init__()
 
         self.image = pygame.Surface([width, height])
-        self.image.fill(GREEN)
+        if image:
+            img = pygame.image.load(image)
+            self.image = pygame.transform.scale(img, (width, height))
+        else:
+            self.image.fill({{ m.settings.default_texture_color|upper }})
 
         self.rect = self.image.get_rect()
 
-{%- if m.items %}
+{% if m.items %}
 
 class Item(pygame.sprite.Sprite):
 
@@ -314,19 +324,12 @@ class {{ l.name }}(Level):
 
         self.level_limit = -1000
 
-        # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
-                 [210, 70, 200, 400],
-                 [210, 70, 600, 300],
-                 ]
-
-        # Go through the array above and add platforms
-        for platform in level:
-            block = Platform(platform[0], platform[1])
-            block.rect.x = platform[2]
-            block.rect.y = platform[3]
-            block.player = self.player
-            self.platform_list.add(block)
+    {%- for platform in l.platforms %}
+        platform{{ loop.index }} = Platform({{ platform.width }}, {{ platform.height }}{%- if platform.texture %}, '{{ platform.texture.path }}'{% endif %})
+        platform{{ loop.index }}.rect.x = {{ platform.x }}
+        platform{{ loop.index }}.rect.y = {{ platform.y }}
+        self.platform_list.add(platform{{ loop.index }})
+    {% endfor %}
 {%- endfor %}
 
 class Game:
