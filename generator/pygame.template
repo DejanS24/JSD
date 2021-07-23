@@ -36,8 +36,19 @@ class Player(pygame.sprite.Sprite):
         width = {{ m.player.width }}
         height = {{ m.player.height }}
     {%- if m.player.avatar.default.path %}
-        self.image = pygame.image.load("{{ m.player.avatar.default.path }}")
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.default_image = pygame.image.load("{{ m.player.avatar.default.path }}")
+        self.image = pygame.transform.scale(self.default_image, (width, height))
+        {%- if m.player.avatar.walkingImage %}
+        self.walking_image = pygame.image.load("{{ m.player.avatar.walkingImage.path }}")
+        self.walking_frames = [self.default_image, self.walking_image]
+        {%- endif %}
+        {%- if m.player.avatar.idleImage %}
+        self.idle_image = pygame.image.load("{{ m.player.avatar.idleImage.path }}")
+        self.standing_frames = [self.default_image, self.idle_image]
+        {%- endif %}
+        {%- if m.player.avatar.jumpingImage %}
+        self.jumping_image = pygame.image.load("{{ m.player.avatar.jumpingImage.path }}")
+        {%- endif %}
     {%- else %}
         self.image = pygame.Surface([width, height])
         self.image.fill({{ m.player.avatar.color.upper() }})
@@ -177,7 +188,13 @@ class Player(pygame.sprite.Sprite):
                 self.rect.x = x_c
     {%- endif %}
     {%- if 'jump' in animate_lvl %}
-
+        if self.jumping:
+            bottom = self.rect.bottom
+            x_c = self.rect.x
+            self.image = pygame.transform.scale(self.jumping_image, (self.width, self.height))
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+            self.rect.x = x_c
     {%- endif %}
     {%- endif %}
 

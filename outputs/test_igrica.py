@@ -15,7 +15,7 @@ SCREEN_HEIGHT = 600
 
 GAME_TITLE = 'Test igrica'
 FONT_NAME = 'arial'
-DEFAULT_COLOR = B
+DEFAULT_COLOR = BLACK
 FPS = 60
 
 # Test igrica
@@ -35,8 +35,8 @@ class Player(pygame.sprite.Sprite):
         # This could also be an image loaded from the disk.
         width = 40
         height = 80
-        self.image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.default_image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
+        self.image = pygame.transform.scale(self.default_image, (width, height))
 
         self.movespeed = 6
 
@@ -144,7 +144,7 @@ class Platform(pygame.sprite.Sprite):
             img = pygame.image.load(image)
             self.image = pygame.transform.scale(img, (width, height))
         else:
-            self.image.fill(G)
+            self.image.fill(GREEN)
 
         self.rect = self.image.get_rect()
 

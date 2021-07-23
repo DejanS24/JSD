@@ -23,7 +23,13 @@ defaults = {
 
 
 def check_color_existing(key, value):
-     return key.__contains__('color') and value not in colors
+    if key.__contains__('color'):
+        if value not in colors:
+            return True
+        else:
+            return False
+    else:
+        return False
 
 
 def set_default_settings(model):
@@ -33,7 +39,7 @@ def set_default_settings(model):
     for key, value in defaults.items():
         attr_val = getattr(model.settings, key)
 
-        if len(attr_val) == 0 and not check_color_existing(key, attr_val):
+        if len(attr_val) == 0 or check_color_existing(key, attr_val[0]):
             setattr(model.settings, key, value)
         else:
             setattr(model.settings, key, attr_val[0])
