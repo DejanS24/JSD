@@ -352,12 +352,29 @@ class {{ l.name }}(Level):
 class Game:
     def __init__(self):
         pygame.init()
+    {%- if m.sounds %}
+        pygame.mixer.init()
+    {%- endif %}
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
         self.playing = False
         self.font_name = pygame.font.match_font(FONT_NAME)
+    {%- if m.sounds|check_sounds%}
+        self.load_sounds()
+
+    def load_sounds(self):
+        {%- if m.sounds.jump_sound %}
+        self.jump_sound = pygame.mixer.Sound("{{ m.sounds.jump_sound }}")
+        {%- endif %}
+        {%- if m.sounds.boost_sound %}
+        self.boost_sound = pygame.mixer.Sound("{{ m.sounds.boost_sound }}")
+        {%- endif %}
+        {%- if m.sounds.point_sound %}
+        self.point_sound = pygame.mixer.Sound("{{ m.sounds.point_sound }}")
+        {%- endif %}
+    {%-endif %}
 
     def new(self):
         self.score = 0
@@ -372,15 +389,25 @@ class Game:
         self.current_level_no = 0
         self.current_level = self.level_list[self.current_level_no]
         self.player.level = self.current_level
+
+    {%- if m.sounds|check_game_music %}
+        pygame.mixer.music.load("{{ m.sounds.game_music }}")
+    {%- endif %}
         self.run()
 
     def run(self):
+    {%- if m.sounds|check_game_music %}
+        pygame.mixer.music.play(loops=-1)
+    {%- endif %}
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
             self.events()
             self.update()
             self.draw()
+    {%- if m.sounds|check_game_music %}
+        pygame.mixer.music.fadeout(500)
+    {%- endif %}
 
     def events(self):
         for event in pygame.event.get():
@@ -451,7 +478,15 @@ class Game:
         self.draw_text("Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
 
         pygame.display.flip()
+    {%- if m.sounds|check_end_music %}
+        pygame.mixer.music.load("{{ m.sounds.end_music }}")
+        pygame.mixer.music.play(loops=-1)
+    {%- endif %}
+
         self.wait_for_key()
+    {%- if m.sounds|check_end_music %}
+        pygame.mixer.music.fadeout(500)
+    {%- endif %}
 
     def wait_for_key(self):
         waiting = True

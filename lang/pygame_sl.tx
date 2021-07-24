@@ -4,6 +4,7 @@ Game:
   player=Player
   items*=Item
   levels+=Level
+  (sounds=Sound)?
   (settings=Setting)?
 ;
 
@@ -80,6 +81,17 @@ BoostInstance:
 PointInstance:
   "point" type=[Point] "{"
     "position" x=INT y=INT
+  "}"
+;
+
+Sound:
+  "sounds" "{"
+    ("game music" game_music=STRING |
+     "jump sound" jump_sound=STRING |
+     "boost sound" boost_sound=STRING |
+     "point sound" point_sound=STRING |
+     "end music" end_music=STRING
+    )+
   "}"
 ;
 

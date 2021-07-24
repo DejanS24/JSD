@@ -43,11 +43,23 @@ def generate(model):
     def check_points(items):
         return check_list(items, 'Point')
 
+    def check_sounds(sounds):
+        return sounds.jump_sound or sounds.boost_sound or sounds.point_sound
+
+    def check_game_music(sounds):
+        return sounds and sounds.game_music
+
+    def check_end_music(sounds):
+        return sounds and sounds.end_music
+
     jinja_env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(join(dirname(__file__))))
     jinja_env.filters['animation_level'] = animation_level
     jinja_env.filters['check_boosts'] = check_boosts
     jinja_env.filters['check_points'] = check_points
+    jinja_env.filters['check_sounds'] = check_sounds
+    jinja_env.filters['check_game_music'] = check_game_music
+    jinja_env.filters['check_end_music'] = check_end_music
     template = jinja_env.get_template('pygame.template')
     with open(join(output_folder, python_module_name(model.name)), 'w') as f:
         f.write(template.render(m=model))
