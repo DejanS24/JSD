@@ -44,6 +44,7 @@ def generate(model):
         return check_list(items, 'Point')
 
     def check_sounds(sounds):
+        if sounds is None: return False
         return sounds.jump_sound or sounds.boost_sound or sounds.point_sound
 
     def check_game_music(sounds):

@@ -54,7 +54,7 @@ Point:
 Level:
   "level" name=ID "{"
     "background" background=ImageOrColor
-    platforms+=Platform
+    platforms*=Platform
     items*=ItemReference
   "}"
 ;

@@ -33,11 +33,15 @@ def check_color_existing(key, value):
 
 
 def set_default_settings(model):
-    print('we here')
     if not model.settings:
         model.settings = {}
+
     for key, value in defaults.items():
-        attr_val = getattr(model.settings, key)
+        try:
+            attr_val = getattr(model.settings, key)
+        except AttributeError:
+            model.settings[key] = value
+            continue
 
         if len(attr_val) == 0 or check_color_existing(key, attr_val[0]):
             setattr(model.settings, key, value)

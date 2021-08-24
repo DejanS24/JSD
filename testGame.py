@@ -150,6 +150,7 @@ class Player(pygame.sprite.Sprite):
 
         # If it is ok to jump, set our speed upwards
         if len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT:
+            self.game.jump_sound.play()
             self.change_y = -10
 
     # Player-controlled movement:
@@ -313,12 +314,14 @@ class Item(pygame.sprite.Sprite):
 class SpeedBoost(Item):
     def picked_up(self):
         super().picked_up()
+        self.player.game.boost_sound.play()
         self.player.movespeed = 20
 
 
 class Point(Item):
     def picked_up(self):
         super().picked_up()
+        self.player.game.point_sound.play()
         self.player.game.score += 10
 
 
@@ -392,12 +395,19 @@ class Level_02(Level):
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
         self.clock = pygame.time.Clock()
         self.running = True
         self.playing = False
         self.font_name = pygame.font.match_font(FONT_NAME)
+        self.load_sounds()
+
+    def load_sounds(self):
+        self.jump_sound = pygame.mixer.Sound("C:/Users/Dejan/Music/Jump33.wav")
+        self.boost_sound = pygame.mixer.Sound("C:/Users/Dejan/Music/Boost16.wav")
+        self.point_sound = pygame.mixer.Sound("C:/Users/Dejan/Music/Jump40.wav")
 
     def new(self):
         self.score = 0
@@ -411,15 +421,18 @@ class Game:
         self.current_level_no = 0
         self.current_level = self.level_list[self.current_level_no]
         self.player.level = self.current_level
+        pygame.mixer.music.load("C:/Users/Dejan/Music/Happy Tune.ogg")
         self.run()
 
     def run(self):
+        pygame.mixer.music.play(loops=-1)
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
             self.events()
             self.update()
             self.draw()
+        pygame.mixer.music.fadeout(500)
 
     def events(self):
         for event in pygame.event.get():
@@ -500,7 +513,11 @@ class Game:
         self.draw_text("Press SPACE to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
 
         pygame.display.flip()
+        pygame.mixer.music.load("C:/Users/Dejan/Music/Yippee.ogg")
+        pygame.mixer.music.play(loops=-1)
+
         self.wait_for_key()
+        pygame.mixer.music.fadeout(500)
 
     def wait_for_key(self):
         waiting = True

@@ -13,12 +13,12 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-GAME_TITLE = 'Test igrica'
+GAME_TITLE = 'Pokemon platformer'
 FONT_NAME = 'arial'
 DEFAULT_COLOR = BLACK
-FPS = 60
+FPS = 55
 
-# Test igrica
+# Pokemon platformer
 class Player(pygame.sprite.Sprite):
     """ This class represents the bar at the bottom that the player
         controls. """
@@ -33,14 +33,22 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = 40
-        height = 80
-        self.default_image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
-        self.image = pygame.transform.scale(self.default_image, (width, height))
+        self.width = 80
+        self.height = 100
+        self.last_update = 0
+        self.current_frame = 0
+
+        self.default_image = pygame.image.load("C:/Users/Dejan/Desktop/pika_default2.PNG")
+        self.image = pygame.transform.scale(self.default_image, (self.width, self.height))
+        self.walking_image = pygame.image.load("C:/Users/Dejan/Desktop/pika_walking2.PNG")
+        self.walking_frames = [self.default_image, self.walking_image]
+        self.idle_image = pygame.image.load("C:/Users/Dejan/Desktop/pika_idle2.PNG")
+        self.standing_frames = [self.default_image, self.idle_image]
+        self.jumping_image = pygame.image.load("C:/Users/Dejan/Desktop/pika_jump2.PNG")
 
         self.movespeed = 6
 
-        # Set a referance to the image rect.
+        # Set a reference to the image rect.
         self.rect = self.image.get_rect()
 
         # Set speed vector of player
@@ -53,6 +61,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         """ Move the player. """
     
+        self.animate()
         # Gravity
         self.calc_grav()
 
@@ -128,6 +137,46 @@ class Player(pygame.sprite.Sprite):
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
+    def animate(self):
+        now = pygame.time.get_ticks()
+        if self.change_x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+
+        if self.change_y != 0:
+            self.jumping = True
+        else:
+            self.jumping = False
+        # show walk animation
+        if self.walking:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                x_c = self.rect.x
+                self.image = pygame.transform.scale(self.walking_frames[self.current_frame], (self.width, self.height))
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+                self.rect.x = x_c
+        # show idle animation
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 350:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames)
+                bottom = self.rect.bottom
+                x_c = self.rect.x
+                self.image = pygame.transform.scale(self.standing_frames[self.current_frame], (self.width, self.height))
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+                self.rect.x = x_c
+        if self.jumping:
+            bottom = self.rect.bottom
+            x_c = self.rect.x
+            self.image = pygame.transform.scale(self.jumping_image, (self.width, self.height))
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+            self.rect.x = x_c
 
 
 class Platform(pygame.sprite.Sprite):
@@ -156,21 +205,19 @@ class Item(pygame.sprite.Sprite):
         super().__init__()
 
         self.player = player
-        width = 30
-        height = 30
-        self.image = pygame.Surface([width, height])
+        self.width = 40
+        self.height = 50
+        self.image = pygame.Surface([self.width, self.height])
         self.image.fill(color)
 
         self.rect = self.image.get_rect()
 
+    def set_img(self, path):
+        img = pygame.image.load(path)
+        self.image = pygame.transform.scale(img, (self.width, self.height))
+
     def picked_up(self):
         self.kill()
-
-
-class SpeedBoost(Item):
-    def picked_up(self):
-        super().picked_up()
-        self.player.movespeed = 20
 
 
 class Point(Item):
@@ -254,35 +301,39 @@ class Level1(Level):
         Level.__init__(self, player)
         self.background = pygame.image.load("C:/Users/Dejan/Pictures/game_background12.jpg")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.item1 = SpeedBoost(self.player)
-        self.item1.rect.x = 120
-        self.item1.rect.y = 150
+        self.item1 = Point(self.player)
+        self.item1.set_img('C:/Users/Dejan/Desktop/nuggets_point2.PNG')
+        
+        self.item1.rect.x = 890
+        self.item1.rect.y = 220
         self.pickups.add(self.item1)
     
 
         self.level_limit = -1000
-        platform1 = Platform(370, 100, 'C:/Users/Dejan/Pictures/Backgrounds/11louisenadeau-springrain.jpg')
-        platform1.rect.x = 420
-        platform1.rect.y = 210
+        platform1 = Platform(80, 30, 'C:/Users/Dejan/Desktop/grass2_texture.PNG')
+        platform1.rect.x = 460
+        platform1.rect.y = 460
         self.platform_list.add(platform1)
     
-
-class Level2(Level):
-    """ Definition for level Level2. """
-
-    def __init__(self, player):
-        """ Create level. """
-
-        # Call the parent constructor
-        Level.__init__(self, player)
-        self.background = pygame.image.load("C:/Users/Dejan/Pictures/game_background13.jpg")
-        self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
-        self.level_limit = -1000
-        platform1 = Platform(370, 100)
-        platform1.rect.x = 420
-        platform1.rect.y = 415
-        self.platform_list.add(platform1)
+        platform2 = Platform(80, 30, 'C:/Users/Dejan/Desktop/grass2_texture.PNG')
+        platform2.rect.x = 600
+        platform2.rect.y = 400
+        self.platform_list.add(platform2)
+    
+        platform3 = Platform(80, 30, 'C:/Users/Dejan/Desktop/grass2_texture.PNG')
+        platform3.rect.x = 750
+        platform3.rect.y = 320
+        self.platform_list.add(platform3)
+    
+        platform4 = Platform(80, 30, 'C:/Users/Dejan/Desktop/grass2_texture.PNG')
+        platform4.rect.x = 940
+        platform4.rect.y = 320
+        self.platform_list.add(platform4)
+    
+        platform5 = Platform(80, 30, 'C:/Users/Dejan/Desktop/grass2_texture.PNG')
+        platform5.rect.x = 1200
+        platform5.rect.y = 320
+        self.platform_list.add(platform5)
     
 
 class Game:
@@ -303,7 +354,6 @@ class Game:
         self.level_list = []
     
         self.level_list.append(Level1(self.player))
-        self.level_list.append(Level2(self.player))
 
         self.current_level_no = 0
         self.current_level = self.level_list[self.current_level_no]

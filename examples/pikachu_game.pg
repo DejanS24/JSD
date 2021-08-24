@@ -1,0 +1,57 @@
+game "Pokemon platformer"
+
+"Pikachu jumping around"
+
+player {
+  image "C:/Users/Dejan/Desktop/pika_default2.PNG"
+  walk image "C:/Users/Dejan/Desktop/pika_walking2.PNG"
+  idle image "C:/Users/Dejan/Desktop/pika_idle2.PNG"
+  jump image "C:/Users/Dejan/Desktop/pika_jump2.PNG"
+  height 100
+  width 80
+}
+
+point nuggies {
+  image "C:/Users/Dejan/Desktop/nuggets_point2.PNG"
+}
+
+level Level1 {
+  background image "C:/Users/Dejan/Pictures/game_background12.jpg"
+  platform {
+    position 460 460
+    texture image "C:/Users/Dejan/Desktop/grass2_texture.PNG"
+    height 30
+    width 80
+  }
+  platform {
+    position 600 400
+    texture image "C:/Users/Dejan/Desktop/grass2_texture.PNG"
+    height 30
+    width 80
+  }
+  platform {
+    position 750 320
+    texture image "C:/Users/Dejan/Desktop/grass2_texture.PNG"
+    height 30
+    width 80
+  }
+  platform {
+    position 940 320
+    texture image "C:/Users/Dejan/Desktop/grass2_texture.PNG"
+    height 30
+    width 80
+  }
+  platform {
+    position 1200 320
+    texture image "C:/Users/Dejan/Desktop/grass2_texture.PNG"
+    height 30
+    width 80
+  }
+  point nuggies {
+    position 890 220
+  }
+}
+
+settings {
+  fps 55
+}

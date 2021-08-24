@@ -37,9 +37,8 @@ def pygame_sl():
 
 if __name__ == '__main__':
 
-    path = "./testigrica.pg"
-    sys.argv[0] = "pygame_sl"
+    path = "./examples/pikachu_game.pg"
+    # path = "./testigrica.pg"
     sys.argv.append(path)
-
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
     pygame_sl()

@@ -33,11 +33,14 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = {{ m.player.width }}
-        height = {{ m.player.height }}
+        self.width = {{ m.player.width }}
+        self.height = {{ m.player.height }}
     {%- if m.player.avatar.default.path %}
+        self.last_update = 0
+        self.current_frame = 0
+
         self.default_image = pygame.image.load("{{ m.player.avatar.default.path }}")
-        self.image = pygame.transform.scale(self.default_image, (width, height))
+        self.image = pygame.transform.scale(self.default_image, (self.width, self.height))
         {%- if m.player.avatar.walkingImage %}
         self.walking_image = pygame.image.load("{{ m.player.avatar.walkingImage.path }}")
         self.walking_frames = [self.default_image, self.walking_image]
@@ -50,13 +53,13 @@ class Player(pygame.sprite.Sprite):
         self.jumping_image = pygame.image.load("{{ m.player.avatar.jumpingImage.path }}")
         {%- endif %}
     {%- else %}
-        self.image = pygame.Surface([width, height])
+        self.image = pygame.Surface([self.width, self.height])
         self.image.fill({{ m.player.avatar.color.upper() }})
     {%- endif %}
 
         self.movespeed = {{ m.settings.movespeed }}
 
-        # Set a referance to the image rect.
+        # Set a reference to the image rect.
         self.rect = self.image.get_rect()
 
         # Set speed vector of player
@@ -225,12 +228,16 @@ class Item(pygame.sprite.Sprite):
         super().__init__()
 
         self.player = player
-        width = 30
-        height = 30
-        self.image = pygame.Surface([width, height])
+        self.width = {{ m.player.width // 2 }}
+        self.height = {{ m.player.height // 2}}
+        self.image = pygame.Surface([self.width, self.height])
         self.image.fill(color)
 
         self.rect = self.image.get_rect()
+
+    def set_img(self, path):
+        img = pygame.image.load(path)
+        self.image = pygame.transform.scale(img, (self.width, self.height))
 
     def picked_up(self):
         self.kill()
@@ -330,10 +337,13 @@ class {{ l.name }}(Level):
 
     {%- for item in l.items %}
         {%- if item.__class__.__name__ == 'BoostInstance' %}
-        self.item{{ loop.index }} = SpeedBoost(self.player)
+        self.item{{ loop.index }} = SpeedBoost(self.player{%- if item.type.avatar.color %}, {{ item.type.avatar.color.upper() }}{% endif %})
         {%- else %}
-        self.item{{ loop.index }} = Point(self.player)
+        self.item{{ loop.index }} = Point(self.player{%- if item.type.avatar.color %}, {{ item.type.avatar.color.upper() }}{% endif %})
         {%- endif %}
+        {%- if item.type.avatar.path %}
+        self.item{{ loop.index }}.set_img('{{ item.type.avatar.path }}')
+        {% endif %}
         self.item{{ loop.index }}.rect.x = {{ item.x }}
         self.item{{ loop.index }}.rect.y = {{ item.y }}
         self.pickups.add(self.item{{ loop.index }})
