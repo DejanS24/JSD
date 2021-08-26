@@ -1,0 +1,9 @@
+[console_scripts]
+textx = textx.cli:textx
+
+[textx_generators]
+pygame_sl_python = generator:generate
+
+[textx_languages]
+pygame_sl = lang:pygame_sl_lang
+

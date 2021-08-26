@@ -1,0 +1,16 @@
+Metadata-Version: 1.0
+Name: pygame-sl
+Version: 0.1
+Summary: A DSL for generating python games using pygame library
+Home-page: https://github.com/DejanS24/JSD
+Author: Dejan Sorgic
+Author-email: dejans1224@gmail.com
+License: UNKNOWN
+Description: # pygame_sl
+        Project for faculty subject JSD
+        
+        pygame_sl is a Domain-Specific Language (DSL) for generating 2D platform games in python using pygame library.
+        It is meant to enable anyone to design their own 2D platform game.
+        
+        The pygame_sl is meant to be easy to understand and use, to design the player, levels and rules of the 2D platform game.
+Platform: UNKNOWN

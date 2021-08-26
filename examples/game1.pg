@@ -1,0 +1,56 @@
+game "2D Platformer test"
+
+player {
+  color blue
+  height 75
+  width 50
+}
+
+point one {
+  color yellow
+}
+
+point two {
+  color blue
+}
+
+level Level1 {
+  background color yellow
+  platform {
+    position 300 420
+    height 50
+    width 80
+  }
+}
+
+level Level2 {
+  background color yellow
+  platform {
+    position 300 420
+    height 50
+    width 80
+  }
+}
+
+level Level3 {
+  background color yellow
+  platform {
+    position 300 420
+    height 50
+    width 80
+  }
+}
+
+level FinalLevel {
+  background color yellow
+  platform {
+    position 300 420
+    height 50
+    width 80
+  }
+}
+
+settings {
+  fps 40
+  title "Cool 2D platformer"
+}

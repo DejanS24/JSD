@@ -1,3 +1,5 @@
+import pdb
+
 from textx.exceptions import TextXSemanticError
 # from pygame_sl.generator import generator
 
@@ -53,6 +55,8 @@ def pygame_sl_model_processor(model, metamodel):
     
     for item in model.items:
         print(item)
+        if item.avatar.__class__.__name__ == 'Color' and check_color_existing('color', item.avatar.color):
+            item.avatar.color = defaults['default_texture_color']
 
     for level in model.levels:
         print(level)

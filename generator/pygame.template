@@ -8,12 +8,13 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
 # Screen dimensions
 SCREEN_WIDTH = {{ m.settings.screen_width }}
 SCREEN_HEIGHT = {{ m.settings.screen_height }}
 
-GAME_TITLE = '{{ m.settings.title or m.name }}'
+GAME_TITLE = '{{ m.settings.title[0] or m.name }}'
 FONT_NAME = '{{ m.settings.font }}'
 DEFAULT_COLOR = {{ m.settings.default_color|upper }}
 FPS = {{ m.settings.fps }}
@@ -35,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         # This could also be an image loaded from the disk.
         self.width = {{ m.player.width }}
         self.height = {{ m.player.height }}
-    {%- if m.player.avatar.default.path %}
+    {%- if m.player.avatar.__class__.__name__ == 'ImageAvatar' and m.player.avatar.default.path %}
         self.last_update = 0
         self.current_frame = 0
 
@@ -330,9 +331,12 @@ class {{ l.name }}(Level):
         # Call the parent constructor
         Level.__init__(self, player)
 
-    {%- if l.background %}
+    {%- if l.background.image %}
         self.background = pygame.image.load("{{ l.background.path }}")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    {%- else %}
+        self.background = pygame.Surface([SCREEN_WIDTH, SCREEN_HEIGHT])
+        self.background.fill({{ l.background.color.upper() }})
     {%- endif %}
 
     {%- for item in l.items %}

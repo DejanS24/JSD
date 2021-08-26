@@ -33,14 +33,17 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
-        width = 40
-        height = 80
+        self.width = 40
+        self.height = 80
+        self.last_update = 0
+        self.current_frame = 0
+
         self.default_image = pygame.image.load("C:/Users/Dejan/Pictures/spriteTest3.PNG")
-        self.image = pygame.transform.scale(self.default_image, (width, height))
+        self.image = pygame.transform.scale(self.default_image, (self.width, self.height))
 
         self.movespeed = 6
 
-        # Set a referance to the image rect.
+        # Set a reference to the image rect.
         self.rect = self.image.get_rect()
 
         # Set speed vector of player
@@ -156,12 +159,16 @@ class Item(pygame.sprite.Sprite):
         super().__init__()
 
         self.player = player
-        width = 30
-        height = 30
-        self.image = pygame.Surface([width, height])
+        self.width = 20
+        self.height = 40
+        self.image = pygame.Surface([self.width, self.height])
         self.image.fill(color)
 
         self.rect = self.image.get_rect()
+
+    def set_img(self, path):
+        img = pygame.image.load(path)
+        self.image = pygame.transform.scale(img, (self.width, self.height))
 
     def picked_up(self):
         self.kill()
@@ -254,7 +261,7 @@ class Level1(Level):
         Level.__init__(self, player)
         self.background = pygame.image.load("C:/Users/Dejan/Pictures/game_background12.jpg")
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.item1 = SpeedBoost(self.player)
+        self.item1 = SpeedBoost(self.player, GREEN)
         self.item1.rect.x = 120
         self.item1.rect.y = 150
         self.pickups.add(self.item1)

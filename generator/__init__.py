@@ -10,17 +10,28 @@ import shutil
 import jinja2
 import datetime
 import re
+from textx import generator
 from generator.util import python_module_name
 
 
-def generate(model):
+@generator('pygame_sl', 'python')
+def generate(metamodel, model, output_path, overwrite, debug):
+    """Generator for python files."""
+
+    input_file = model._tx_filename
+    base_dir = output_path if output_path else os.path.dirname(input_file)
+    # base_name, _ = os.path.splitext(os.path.basename(input_file))
+    output_folder = os.path.abspath(base_dir)
+
     # output_folder = target.output
 
-    output_folder = "./outputs/"
+    # output_folder = "./outputs/"
 
     # Provera da li postoji generisan fajl sa tim imenom
 
     def animation_level(avatar):
+        if avatar.__class__.__name__ == 'Color':
+            return ''
         animation_lvl = ''
         if avatar.walkingImage:
             animation_lvl += 'walk '
