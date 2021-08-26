@@ -12,6 +12,17 @@ The pygame_sl is meant to be easy to understand and use, to design the player av
 
 # Usage:
 - `textx generate <path_to_.pg_file> --target python [--output-path <path>]`
+- Requirements to run generated python file: `pygame`
+- `python <path_to_generated_.py_file>`
+
+# Features:
+- Modify player avatar and dimensions
+- Add additional images for player avatar to enable animations
+- Define pickup items (point or speed boost)
+- Define levels with image or color backgrounds
+- Add platforms to levels (define textures and dimensions) and defined items on specified coordinates
+- Define sounds to be played during game or on specific actions (jump, items pickup, game end)
+- Define custom settings for the game in general: custom title, fps, default move speed, screen size, default colors and font name
 
 # Example of a .pg file:
 ```

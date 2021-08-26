@@ -1,6 +1,3 @@
-import pdb
-
-from textx.exceptions import TextXSemanticError
 # from pygame_sl.generator import generator
 
 colors = [
